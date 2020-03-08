@@ -47,22 +47,32 @@ while($i = $e->fetch()) {
         $suggetion = [];
     }
     //fin
+    //Recuperation des favoris
+    $q30 = $db->query("SELECT *FROM favoris WHERE favoris.id_user = $myid AND id_son_favoris = $id_user");
+    if($q30->rowcount() >=1) {
+        $favoris = true;
+    } else {
+        $favoris = false;
+    }
+    //fin
     // recuperation des users photo dans l'album
     $q = $db->query("SELECT photo FROM album WHERE album.id_user = $id_user");
     $ei= $q->rowcount();
      // recuperation des coup de coeur
-   $qp= $db->query("SELECT id_flasher, id_flasheur FROM flash WHERE flash.id_flasheur = $id_user AND flash.id_flasher = $myid");
+   $qp= $db->query("SELECT id_flasher, id_flasheur,reponse FROM flash WHERE flash.id_flasheur = $id_user AND flash.id_flasher = $myid");
    $eii= $qp->rowcount();
    if($eii >= 1) {
-       $flash = true;
+       $ii = $qp->fetch();
+       $flash = ["etat"=> true, "reponse"=> $ii['reponse']];
    } else {
-       $flash = false;
+        $ii = $qp->fetch();
+       $flash = ["etat"=> false, "reponse"=> null];
    }
     if($ei >= 1) {
-       $p = array_merge($i, ['album'=> $q->fetchAll(), 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion]);
+       $p = array_merge($i, ['album'=> $q->fetchAll(), 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris]);
        array_push($tab, $p);
     } else {
-        $p = array_merge($i, ['album'=> [], 'flash'=> $flash,"interets"=>$interets,"mode"=> $mode, 'kilometre'=> $distance, 'suggetion'=> $suggetion]);
+        $p = array_merge($i, ['album'=> [], 'flash'=> $flash,"interets"=>$interets,"mode"=> $mode, 'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris]);
         array_push($tab, $p);
     }
   
