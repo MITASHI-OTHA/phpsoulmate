@@ -59,14 +59,14 @@ while($i = $e->fetch()) {
     $q = $db->query("SELECT photo FROM album WHERE album.id_user = $id_user");
     $ei= $q->rowcount();
      // recuperation des coup de coeur
-   $qp= $db->query("SELECT id_flasher, id_flasheur,reponse FROM flash WHERE flash.id_flasheur = $id_user AND flash.id_flasher = $myid");
+   $qp= $db->query("SELECT id, id_flasher, id_flasheur,reponse FROM flash WHERE flash.id_flasheur = $id_user AND flash.id_flasher = $myid");
    $eii= $qp->rowcount();
    if($eii >= 1) {
        $ii = $qp->fetch();
-       $flash = ["etat"=> true, "reponse"=> $ii['reponse']];
+       $flash = ["id"=>$ii['id'], "etat"=> true, "reponse"=> $ii['reponse']];
    } else {
         $ii = $qp->fetch();
-       $flash = ["etat"=> false, "reponse"=> null];
+       $flash = ["id"=>$ii['id'], "etat"=> false, "reponse"=> null];
    }
     if($ei >= 1) {
        $p = array_merge($i, ['album'=> $q->fetchAll(), 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris]);
