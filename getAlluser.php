@@ -46,6 +46,7 @@ while($i = $e->fetch()) {
     } else {
         $suggetion = [];
     }
+    
     //fin
     //Recuperation des favoris
     $q30 = $db->query("SELECT *FROM favoris WHERE favoris.id_user = $myid AND id_son_favoris = $id_user");
@@ -53,6 +54,63 @@ while($i = $e->fetch()) {
         $favoris = true;
     } else {
         $favoris = false;
+    }
+    //fin
+    //recuperation de la blacklist
+    $blacklist = false;
+    $b = $db->query("SELECT *FROM blacklist WHERE id_user = $myid AND id_blocker= $id_user");
+    if($b->rowcount() >=1) {
+        $blacklist = true;
+    }
+    //fin
+    //recuperation des matchs
+    $match = false;
+    $m = $db->query("SELECT id, id_flasher, id_flasheur,reponse FROM flash WHERE flash.id_flasheur = $id_user AND flash.id_flasher = $myid AND flash.reponse = 2 OR flash.id_flasheur = $myid  AND flash.id_flasher = $id_user AND flash.reponse = 2");
+    if($m->rowcount() >= 1) {
+        $match = true;
+    }
+    //fin
+    //Recuperation des visite reçu
+    $ma_visite = false;
+    $v = $db->query("SELECT *FROM visitefaite WHERE id_user = $myid AND id_visiteur = $id_user");
+    if($v->rowcount() >=1 ) {
+        $ma_visite = true;
+    }
+    //fin
+    //Recuperation des visites faites
+    $jai_visite = false;
+    $v2 = $db->query("SELECT *FROM visitefaite WHERE id_user =$id_user AND id_visiteur = $myid");
+    if($v2->rowcount() >=1 ) {
+        $jai_visite = true;
+    }
+    //fin
+    //Recuperation des flashs faites
+    $jai_flasher = false;
+    $f = $db->query("SELECT *FROM flash WHERE id_flasher =$id_user AND id_flasheur = $myid");
+    if($f->rowcount() >=1 ) {
+        $jai_flasher = true;
+    }
+    //fin
+    //Recuperation des flashs recu
+    $il_ma_flasher = false;
+    $f2 = $db->query("SELECT *FROM flash WHERE id_flasher = $myid AND id_flasheur = $id_user");
+    if($f2->rowcount() >=1 ) {
+        $il_ma_flasher = true;
+    }
+    //fin
+    //Recuperation des suggetions faites
+    $jai_suggerer = ["etat"=>false, "type"=>  0];
+    $s = $db->query("SELECT *FROM suggestions WHERE id_suggereur = $myid AND id_user = $id_user");
+    if($s->rowcount() >=1 ) {
+        $il = $s->fetch();
+        $jai_suggerer = ["etat"=>true, "type"=> $il['sujet']];
+    }
+    //fin
+    //Recuperation des suggetions reçus
+    $il_ma_suggerer = ["etat"=>false, "type"=>  0];
+    $s2 = $db->query("SELECT *FROM suggestions WHERE id_suggereur = $id_user AND id_user = $myid");
+    if($s2->rowcount() >=1 ) {
+        $il_ma_suggerer = ["etat"=>false, "type"=>  $i['sujet']];
     }
     //fin
     // recuperation des users photo dans l'album
@@ -68,14 +126,12 @@ while($i = $e->fetch()) {
         $ii = $qp->fetch();
        $flash = ["id"=>$ii['id'], "etat"=> false, "reponse"=> null];
    }
+   $mytab = [];
     if($ei >= 1) {
-       $p = array_merge($i, ['album'=> $q->fetchAll(), 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris]);
-       array_push($tab, $p);
-    } else {
-        $p = array_merge($i, ['album'=> [], 'flash'=> $flash,"interets"=>$interets,"mode"=> $mode, 'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris]);
-        array_push($tab, $p);
+    $mytab = $q->fetchAll();
     }
-  
+    $p = array_merge($i, ['album'=>  $mytab, 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris, 'blacklist'=> $blacklist, 'match'=> $match, "ma_visite"=> $ma_visite, "jai_visite"=>$jai_visite, "jai_flasher"=>$jai_flasher, "il_ma_flasher"=>$il_ma_flasher, "jai_suggerer"=>$jai_suggerer, "il_ma_suggerer"=> $il_ma_suggerer]);
+       array_push($tab, $p);
 }
 echo json_encode($tab);
 ?>
