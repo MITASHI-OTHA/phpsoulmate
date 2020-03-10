@@ -113,6 +113,13 @@ while($i = $e->fetch()) {
         $il_ma_suggerer = ["etat"=>false, "type"=>  $i['sujet']];
     }
     //fin
+    //recuperation des chats
+    $chat = [];
+    $c = $db->query("SELECT id, id_exp, id_dest, dates,messages, etat, chaine,photo, nom FROM chat WHERE id_exp = $id_user AND id_dest = $myid OR id_exp = $myid AND id_dest = $id_user");
+    if($c->rowcount() >=1 ) {
+        $chat = $c->fetchAll();
+    }
+    //
     // recuperation des users photo dans l'album
     $q = $db->query("SELECT photo FROM album WHERE album.id_user = $id_user");
     $ei= $q->rowcount();
@@ -130,7 +137,7 @@ while($i = $e->fetch()) {
     if($ei >= 1) {
     $mytab = $q->fetchAll();
     }
-    $p = array_merge($i, ['album'=>  $mytab, 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris, 'blacklist'=> $blacklist, 'match'=> $match, "ma_visite"=> $ma_visite, "jai_visite"=>$jai_visite, "jai_flasher"=>$jai_flasher, "il_ma_flasher"=>$il_ma_flasher, "jai_suggerer"=>$jai_suggerer, "il_ma_suggerer"=> $il_ma_suggerer]);
+    $p = array_merge($i, ['album'=>  $mytab, 'flash'=> $flash, "interets"=>$interets,"mode"=> $mode,'kilometre'=> $distance, 'suggetion'=> $suggetion, 'favoris'=>$favoris, 'blacklist'=> $blacklist, 'match'=> $match, "ma_visite"=> $ma_visite, "jai_visite"=>$jai_visite, "jai_flasher"=>$jai_flasher, "il_ma_flasher"=>$il_ma_flasher, "jai_suggerer"=>$jai_suggerer, "il_ma_suggerer"=> $il_ma_suggerer, "chat"=> $chat]);
        array_push($tab, $p);
 }
 echo json_encode($tab);
